@@ -17,7 +17,7 @@
 
 from unittest.mock import MagicMock
 
-from numpy import array, float32
+from numpy import array, array_equal, float32
 
 from flwr.common import (
     Code,
@@ -96,4 +96,4 @@ def test_aggregate_fit() -> None:
     assert actual_aggregated
     actual_list = parameters_to_ndarrays(actual_aggregated)
     actual = actual_list[0]
-    assert (actual == expected[0]).all()
+    assert array_equal(actual, expected[0])

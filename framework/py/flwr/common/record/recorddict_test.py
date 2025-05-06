@@ -65,7 +65,7 @@ def test_ndarray_to_array() -> None:
 
     array = ndarray_to_array(arr)
 
-    arr_ = np.frombuffer(buffer=array.data, dtype=array.dtype).reshape(array.shape)
+    arr_ = np.reshape(np.frombuffer(buffer=array.data, dtype=array.dtype), array.shape)
 
     assert np.array_equal(arr, arr_)
 
@@ -268,13 +268,13 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
     labels = [1, 2.0]
     arrays = get_ndarrays()
     my_metrics = OrderedDict(
-        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)}
+        {str(label): np.ravel(arr).tolist() for label, arr in zip(labels, arrays)}
     )
 
     my_metrics_copy = my_metrics.copy()
 
     # Add metric
-    m_record = MetricRecord(my_metrics, keep_input=keep_input)  # type: ignore
+    m_record = MetricRecord(my_metrics, keep_input=keep_input)
 
     # Check metrics are actually added
     # Check that input dict has been emptied when enabled such behaviour

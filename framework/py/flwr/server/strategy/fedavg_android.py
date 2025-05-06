@@ -236,7 +236,8 @@ class FedAvgAndroid(Strategy):
 
     def ndarray_to_bytes(self, ndarray: NDArray) -> bytes:
         """Serialize NumPy array to bytes."""
-        return ndarray.tobytes()
+        data: bytes = ndarray.tobytes()
+        return data
 
     def bytes_to_ndarray(self, tensor: bytes) -> NDArray:
         """Deserialize NumPy array from bytes."""

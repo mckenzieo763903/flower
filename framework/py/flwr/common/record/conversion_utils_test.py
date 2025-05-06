@@ -30,7 +30,9 @@ class TestArrayFromNumpy(unittest.TestCase):
     def test_array_from_numpy(self) -> None:
         """Test the array_from_numpy function."""
         # Prepare
-        original_array = np.array([1, 2, 3], dtype=np.float32)
+        original_array: np.ndarray[tuple[int, ...], np.dtype[np.float32]] = np.array(
+            [1, 2, 3], dtype=np.float32
+        )
 
         # Execute
         array_instance = array_from_numpy(original_array)

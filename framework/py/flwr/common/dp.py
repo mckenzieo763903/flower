@@ -34,7 +34,7 @@ def add_gaussian_noise(update: NDArrays, std_dev: float) -> NDArrays:
     """Add iid Gaussian noise to each floating point value in the update."""
     warn_deprecated_feature("`add_gaussian_noise` method")
     update_noised = [
-        layer + np.random.normal(0, std_dev, layer.shape) for layer in update
+        layer + np.random.normal(0, std_dev, np.shape(layer)) for layer in update
     ]
     return update_noised
 
