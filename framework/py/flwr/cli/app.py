@@ -52,6 +52,7 @@ typer_click_object = get_command(app)
 
 @app.callback(invoke_without_command=True)
 def version_callback(
+    ctx: typer.Context,
     ver: bool = typer.Option(
         None,
         "-V",
