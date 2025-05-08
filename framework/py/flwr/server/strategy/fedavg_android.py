@@ -228,7 +228,7 @@ class FedAvgAndroid(Strategy):
     def ndarrays_to_parameters(self, ndarrays: NDArrays) -> Parameters:
         """Convert NumPy ndarrays to parameters object."""
         tensors = [self.ndarray_to_bytes(ndarray) for ndarray in ndarrays]
-        return Parameters(tensors=tensors, tensor_type="numpy.nda")
+        return Parameters(tensors=tensors, tensor_type="numpy.ndarray")
 
     def parameters_to_ndarrays(self, parameters: Parameters) -> NDArrays:
         """Convert parameters object to NumPy weights."""

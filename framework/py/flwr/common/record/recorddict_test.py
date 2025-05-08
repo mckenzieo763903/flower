@@ -29,11 +29,16 @@ from flwr.common.recorddict_compat import (
     arrayrecord_to_parameters,
     parameters_to_arrayrecord,
 )
+from typing import TYPE_CHECKING
+
+import numpy as np
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray, NDArrays
+
 from flwr.common.typing import (
     ConfigRecordValues,
     MetricRecordValues,
-    NDArray,
-    NDArrays,
     Parameters,
 )
 

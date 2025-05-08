@@ -16,9 +16,11 @@
 
 
 import numpy as np
+from typing import List
 
 from flwr.common.logger import warn_deprecated_feature
-from flwr.common.typing import NDArrays
+
+NDArrays = List[np.ndarray]
 
 
 # Calculates the L2-norm of a potentially ragged array

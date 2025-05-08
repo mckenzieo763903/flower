@@ -29,21 +29,21 @@ from flwr.common import (
 from flwr.common.logger import log
 
 
-def get_norm(input_arrays: NDArrays) -> float:
+def get_norm(input_arrays: list[np.ndarray]) -> float:
     """Compute the L2 norm of the flattened input."""
     array_norms = [np.linalg.norm(array.flat) for array in input_arrays]
     # pylint: disable=consider-using-generator
     return float(np.sqrt(sum([norm**2 for norm in array_norms])))
 
 
-def add_gaussian_noise_inplace(input_arrays: NDArrays, std_dev: float) -> None:
+def add_gaussian_noise_inplace(input_arrays: list[np.ndarray], std_dev: float) -> None:
     """Add Gaussian noise to each element of the input arrays."""
     for array in input_arrays:
         noise = np.random.normal(0, std_dev, array.shape).astype(array.dtype)
         array += noise
 
 
-def clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> None:
+def clip_inputs_inplace(input_arrays: list[np.ndarray], clipping_norm: float) -> None:
     """Clip model update based on the clipping norm in-place.
 
     FlatClip method of the paper: https://arxiv.org/abs/1710.06963
@@ -65,7 +65,7 @@ def compute_stdv(
 
 
 def compute_clip_model_update(
-    param1: NDArrays, param2: NDArrays, clipping_norm: float
+    param1: list[np.ndarray], param2: list[np.ndarray], clipping_norm: float
 ) -> None:
     """Compute model update (param1 - param2) and clip it.
 
@@ -77,7 +77,7 @@ def compute_clip_model_update(
         param1[i] = param2[i] + model_update[i]
 
 
-def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> bool:
+def adaptive_clip_inputs_inplace(input_arrays: list[np.ndarray], clipping_norm: float) -> bool:
     """Clip model update based on the clipping norm in-place.
 
     It returns true if scaling_factor < 1 which is used for norm_bit
@@ -91,7 +91,7 @@ def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -
 
 
 def compute_adaptive_clip_model_update(
-    param1: NDArrays, param2: NDArrays, clipping_norm: float
+    param1: list[np.ndarray], param2: list[np.ndarray], clipping_norm: float
 ) -> bool:
     """Compute model update, clip it, then add the clipped value to param1.
 

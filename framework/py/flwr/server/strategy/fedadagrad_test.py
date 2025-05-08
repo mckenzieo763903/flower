@@ -37,7 +37,7 @@ from .fedadagrad import FedAdagrad
 def test_aggregate_fit() -> None:
     """Tests if adagrad function is aggregating correctly."""
     # Prepare
-    previous_weights: NDArrays = [array([0.1, 0.1, 0.1, 0.1], dtype=float32)]
+    previous_weights: list[np.ndarray] = [array([0.1, 0.1, 0.1, 0.1], dtype=float32)]
     strategy = FedAdagrad(
         eta=0.1,
         eta_l=0.316,
@@ -73,7 +73,7 @@ def test_aggregate_fit() -> None:
             ),
         ),
     ]
-    expected: NDArrays = [array([0.15, 0.15, 0.15, 0.15], dtype=float32)]
+    expected: list[np.ndarray] = [array([0.15, 0.15, 0.15, 0.15], dtype=float32)]
 
     # Execute
     actual_aggregated, _ = strategy.aggregate_fit(
