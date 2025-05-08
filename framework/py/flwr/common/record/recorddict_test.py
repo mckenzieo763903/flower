@@ -51,10 +51,10 @@ def get_ndarrays() -> NDArrays:
 def ndarray_to_array(ndarray: NDArray) -> Array:
     """Represent NumPy ndarray as Array."""
     return Array(
-        data=ndarray.tobytes(),
-        dtype=str(ndarray.dtype),
+        data=ndarray.tobytes(),  # type: ignore[union-attr]
+        dtype=str(ndarray.dtype),  # type: ignore[union-attr]
         stype="numpy.ndarray.tobytes",
-        shape=list(ndarray.shape),
+        shape=list(ndarray.shape),  # type: ignore[union-attr]
     )
 
 
@@ -65,7 +65,7 @@ def test_ndarray_to_array() -> None:
 
     array = ndarray_to_array(arr)
 
-    arr_ = np.frombuffer(buffer=array.data, dtype=array.dtype).reshape(array.shape)
+    arr_ = np.frombuffer(buffer=array.data, dtype=array.dtype).reshape(array.shape)  # type: ignore[union-attr]
 
     assert np.array_equal(arr, arr_)
 
@@ -193,7 +193,7 @@ def test_set_metrics_to_metricrecord_with_correct_types(
     arrays = get_ndarrays()
 
     my_metrics = OrderedDict(
-        {key_type(label): value_fn(arr) for label, arr in zip(labels, arrays)}
+        {key_type(label): value_fn(arr) for label, arr in zip(labels, arrays)}  # type: ignore[union-attr]
     )
 
     # Add metric
@@ -269,7 +269,7 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
     arrays = get_ndarrays()
     my_metrics = cast(
         dict[str, MetricRecordValues],
-        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},
+        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},  # type: ignore[union-attr]
     )
     my_metrics_copy = my_metrics.copy()
 
@@ -288,16 +288,16 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
 @pytest.mark.parametrize(
     "key_type, value_fn",
     [
-        (str, lambda x: str(x.flatten()[0])),  # str: str
-        (str, lambda x: int(x.flatten()[0])),  # str: int
-        (str, lambda x: float(x.flatten()[0])),  # str: float
-        (str, lambda x: bool(x.flatten()[0])),  # str: bool
-        (str, lambda x: x.flatten().tobytes()),  # str: bytes
-        (str, lambda x: x.flatten().astype("str").tolist()),  # str: List[str]
-        (str, lambda x: x.flatten().astype("int").tolist()),  # str: List[int]
-        (str, lambda x: x.flatten().astype("float").tolist()),  # str: List[float]
-        (str, lambda x: x.flatten().astype("bool").tolist()),  # str: List[bool]
-        (str, lambda x: [x.flatten().tobytes()]),  # str: List[bytes]
+        (str, lambda x: str(x.flatten()[0])),  # str: str  # type: ignore[union-attr]
+        (str, lambda x: int(x.flatten()[0])),  # str: int  # type: ignore[union-attr]
+        (str, lambda x: float(x.flatten()[0])),  # str: float  # type: ignore[union-attr]
+        (str, lambda x: bool(x.flatten()[0])),  # str: bool  # type: ignore[union-attr]
+        (str, lambda x: x.flatten().tobytes()),  # str: bytes  # type: ignore[union-attr]
+        (str, lambda x: x.flatten().astype("str").tolist()),  # str: List[str]  # type: ignore[union-attr]
+        (str, lambda x: x.flatten().astype("int").tolist()),  # str: List[int]  # type: ignore[union-attr]
+        (str, lambda x: x.flatten().astype("float").tolist()),  # str: List[float]  # type: ignore[union-attr]
+        (str, lambda x: x.flatten().astype("bool").tolist()),  # str: List[bool]  # type: ignore[union-attr]
+        (str, lambda x: [x.flatten().tobytes()]),  # str: List[bytes]  # type: ignore[union-attr]
         (str, lambda x: []),  # str: emptyt list
     ],
 )
@@ -325,11 +325,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         (str, lambda x: x),  # str: NDArray (supported: unsupported)
         (
             str,
-            lambda x: {str(v): v for v in x.flatten()},
+            lambda x: {str(v): v for v in x.flatten()},  # type: ignore[union-attr]
         ),  # str: dict[str: float] (supported: unsupported)
         (
             str,
-            lambda x: [{str(v): v for v in x.flatten()}],
+            lambda x: [{str(v): v for v in x.flatten()}],  # type: ignore[union-attr]
         ),  # str: List[dict[str: float]] (supported: unsupported)
         (
             str,
@@ -337,11 +337,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         ),  # str: List[mixing valid types] (supported: unsupported)
         (
             int,
-            lambda x: x.flatten().tolist(),
+            lambda x: x.flatten().tolist(),  # type: ignore[union-attr]
         ),  # int: List[str] (unsupported: supported)
         (
             float,
-            lambda x: x.flatten().tolist(),
+            lambda x: x.flatten().tolist(),  # type: ignore[union-attr]
         ),  # float: List[int] (unsupported: supported)
     ],
 )

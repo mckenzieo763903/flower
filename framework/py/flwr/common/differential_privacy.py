@@ -31,7 +31,7 @@ from flwr.common.logger import log
 
 def get_norm(input_arrays: NDArrays) -> float:
     """Compute the L2 norm of the flattened input."""
-    array_norms = [np.linalg.norm(array.flat) for array in input_arrays]
+    array_norms = [np.linalg.norm(np.asarray(array).flat) for array in input_arrays]
     # pylint: disable=consider-using-generator
     return float(np.sqrt(sum([norm**2 for norm in array_norms])))
 
@@ -39,8 +39,8 @@ def get_norm(input_arrays: NDArrays) -> float:
 def add_gaussian_noise_inplace(input_arrays: NDArrays, std_dev: float) -> None:
     """Add Gaussian noise to each element of the input arrays."""
     for array in input_arrays:
-        noise = np.random.normal(0, std_dev, array.shape).astype(array.dtype)
-        array += noise
+        noise = np.random.normal(0, std_dev, np.asarray(array).shape).astype(np.asarray(array).dtype)
+        np.add(array, noise, out=array)
 
 
 def clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> None:
@@ -51,7 +51,7 @@ def clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> None:
     input_norm = get_norm(input_arrays)
     scaling_factor = min(1, clipping_norm / input_norm)
     for array in input_arrays:
-        array *= scaling_factor
+        np.multiply(array, scaling_factor, out=array)
 
 
 def compute_stdv(
@@ -74,7 +74,7 @@ def compute_clip_model_update(
     clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
-        param1[i] = param2[i] + model_update[i]
+        param1[i] = np.add(param2[i], model_update[i])
 
 
 def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> bool:
@@ -86,7 +86,7 @@ def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -
     input_norm = get_norm(input_arrays)
     scaling_factor = min(1, clipping_norm / input_norm)
     for array in input_arrays:
-        array *= scaling_factor
+        np.multiply(array, scaling_factor, out=array)
     return scaling_factor < 1
 
 
@@ -102,7 +102,7 @@ def compute_adaptive_clip_model_update(
     norm_bit = adaptive_clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
-        param1[i] = param2[i] + model_update[i]
+        param1[i] = np.add(param2[i], model_update[i])
 
     return norm_bit
 

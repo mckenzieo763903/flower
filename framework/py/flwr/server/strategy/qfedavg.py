@@ -198,7 +198,7 @@ class QFedAvg(FedAvg):
             new_weights = parameters_to_ndarrays(fit_res.parameters)
             # plug in the weight updates into the gradient
             grads = [
-                np.multiply((u - v), 1.0 / self.learning_rate)
+                np.multiply(np.subtract(u, v), 1.0 / self.learning_rate)
                 for u, v in zip(weights_before, new_weights)
             ]
             deltas.append(

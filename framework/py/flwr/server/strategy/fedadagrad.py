@@ -144,7 +144,7 @@ class FedAdagrad(FedOpt):
         fedavg_weights_aggregate = parameters_to_ndarrays(fedavg_parameters_aggregated)
 
         # Adagrad
-        delta_t: NDArrays = [
+        delta_t: list[np.ndarray] = [
             x - y for x, y in zip(fedavg_weights_aggregate, self.current_weights)
         ]
 

@@ -20,7 +20,7 @@ from typing import Any, Callable, Union
 
 import numpy as np
 
-from flwr.common import FitRes, NDArray, NDArrays, parameters_to_ndarrays
+from flwr.common import FitRes, NDArrays, parameters_to_ndarrays
 from flwr.server.client_proxy import ClientProxy
 
 
@@ -53,9 +53,9 @@ def aggregate_inplace(results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
     )
 
     def _try_inplace(
-        x: NDArray, y: Union[NDArray, np.float64], np_binary_op: np.ufunc
-    ) -> NDArray:
-        return (  # type: ignore[no-any-return]
+        x: np.ndarray, y: Union[np.ndarray, np.float64], np_binary_op: np.ufunc
+    ) -> np.ndarray:
+        return (
             np_binary_op(x, y, out=x)
             if np.can_cast(y, x.dtype, casting="same_kind")
             else np_binary_op(x, np.array(y, x.dtype), out=x)
