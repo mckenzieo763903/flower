@@ -22,8 +22,8 @@ from typing import Any, Callable, Optional, Union
 import numpy as np
 import numpy.typing as npt
 
-NDArray = npt.NDArray[Any]
-NDArrayInt = npt.NDArray[np.int_]
+NDArray = npt.NDArray[np.ndarray]
+NDArrayInt = npt.NDArray[np.int64]
 NDArrayFloat = npt.NDArray[np.float64]
 NDArrays = list[NDArray]
 

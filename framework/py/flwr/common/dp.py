@@ -30,7 +30,7 @@ def _get_update_norm(update: NDArrays) -> float:
     return float(np.sqrt(np.sum(np.square(flattened_update))))
 
 
-def add_gaussian_noise(update: NDArrays, std_dev: float) -> NDArrays:
+def add_gaussian_noise(update: np.ndarray, std_dev: float) -> np.ndarray:
     """Add iid Gaussian noise to each floating point value in the update."""
     warn_deprecated_feature("`add_gaussian_noise` method")
     update_noised = [

@@ -57,7 +57,6 @@ def version_callback(
         "-V",
         "--version",
         is_eager=True,
-        help="Show the version and exit.",
     ),
 ) -> None:
     """Print version."""
