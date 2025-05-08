@@ -30,7 +30,7 @@ def _get_update_norm(update: NDArrays) -> float:
     return float(np.sqrt(np.sum(np.square(flattened_update))))
 
 
-def add_gaussian_noise(update: NDArrays, std_dev: float) -> NDArrays:
+def add_gaussian_noise(update: NDArrays, std_dev: float) -> list[np.ndarray]:
     """Add iid Gaussian noise to each floating point value in the update."""
     warn_deprecated_feature("`add_gaussian_noise` method")
     update_noised = [
@@ -39,10 +39,10 @@ def add_gaussian_noise(update: NDArrays, std_dev: float) -> NDArrays:
     return update_noised
 
 
-def clip_by_l2(update: NDArrays, threshold: float) -> tuple[NDArrays, bool]:
+def clip_by_l2(update: NDArrays, threshold: float) -> tuple[list[np.ndarray], bool]:
     """Scales the update so thats its L2 norm is upper-bound to threshold."""
     warn_deprecated_feature("`clip_by_l2` method")
     update_norm = _get_update_norm(update)
     scaling_factor = min(1, threshold / update_norm)
-    update_clipped: NDArrays = [layer * scaling_factor for layer in update]
+    update_clipped: list[np.ndarray] = [layer * scaling_factor for layer in update]
     return update_clipped, (scaling_factor < 1)
