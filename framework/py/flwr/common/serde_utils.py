@@ -20,12 +20,12 @@ from typing import Any, TypeVar, cast
 from google.protobuf.message import Message as GrpcMessage
 
 from flwr.proto.recorddict_pb2 import (
-    BoolList,
-    BytesList,
-    DoubleList,
-    SintList,
-    StringList,
-    UintList,
+    BoolValue,
+    BytesValue,
+    DoubleValue,
+    Sint64Value,
+    StringValue,
+    Uint64Value,
 )
 
 from .constant import INT64_MAX_VALUE
