@@ -20,6 +20,14 @@ from typing import Any, Union
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
 
+# Ensure NDArray is correctly imported for mypy compatibility
+try:
+    from numpy.typing import NDArray as _NDArray
+except ImportError:
+    from numpy import ndarray as _NDArray
+
+NDArray = _NDArray
+
 
 def factor_combine(factor: int, parameters: list[NDArray[Any]]) -> list[NDArray[Any]]:
     """Combine factor with parameters."""

@@ -44,5 +44,5 @@ def clip_by_l2(update: NDArrays, threshold: float) -> tuple[NDArrays, bool]:
     warn_deprecated_feature("`clip_by_l2` method")
     update_norm = _get_update_norm(update)
     scaling_factor = min(1, threshold / update_norm)
-    update_clipped: NDArrays = [layer * scaling_factor for layer in update]
+    update_clipped: NDArrays = [np.asarray(layer) * scaling_factor for layer in update]
     return update_clipped, (scaling_factor < 1)

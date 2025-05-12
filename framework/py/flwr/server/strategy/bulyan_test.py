@@ -37,7 +37,7 @@ from .bulyan import Bulyan
 def test_aggregate_fit() -> None:
     """Tests if Bulyan is aggregating correctly."""
     # Prepare
-    previous_weights: NDArrays = [array([0.1, 0.1, 0.1, 0.1], dtype=float32)]
+    previous_weights: list[NDArray] = [array([0.1, 0.1, 0.1, 0.1], dtype=float32)]
     strategy = Bulyan(
         initial_parameters=ndarrays_to_parameters(previous_weights),
         num_malicious_clients=0,
@@ -118,7 +118,7 @@ def test_aggregate_fit() -> None:
         ),
     ]
     coordinate = (0.2 + 0.5 + 0.7 + 12.0 + 0.1 + 0.1) / 6
-    expected: NDArrays = [array([coordinate] * 4, dtype=float32)]
+    expected: list[NDArray] = [array([coordinate] * 4, dtype=float32)]
 
     # Execute
     actual_aggregated, _ = strategy.aggregate_fit(

@@ -141,19 +141,19 @@ def test_krum_num_evaluation_clients_minimum() -> None:
 def test_aggregate_fit() -> None:
     """Tests if Krum is aggregating correctly."""
     # Prepare
-    previous_weights: NDArrays = [array([0.1, 0.1, 0.1, 0.1], dtype=float32)]
+    previous_weights: NDArrays = [np.array([0.1, 0.1, 0.1, 0.1], dtype=np.float32)]
     strategy = Krum(
         initial_parameters=ndarrays_to_parameters(previous_weights),
         num_malicious_clients=1,
     )
     param_0: Parameters = ndarrays_to_parameters(
-        [array([0.2, 0.2, 0.2, 0.2], dtype=float32)]
+        [np.array([0.2, 0.2, 0.2, 0.2], dtype=np.float32)]
     )
     param_1: Parameters = ndarrays_to_parameters(
-        [array([0.7, 0.7, 0.7, 0.7], dtype=float32)]
+        [np.array([0.7, 0.7, 0.7, 0.7], dtype=np.float32)]
     )
     param_2: Parameters = ndarrays_to_parameters(
-        [array([1.0, 1.0, 1.0, 1.0], dtype=float32)]
+        [np.array([1.0, 1.0, 1.0, 1.0], dtype=np.float32)]
     )
     bridge = MagicMock()
     client_0 = GrpcClientProxy(cid="0", bridge=bridge)
@@ -188,7 +188,7 @@ def test_aggregate_fit() -> None:
             ),
         ),
     ]
-    expected: NDArrays = [array([0.7, 0.7, 0.7, 0.7], dtype=float32)]
+    expected: NDArrays = [np.array([0.7, 0.7, 0.7, 0.7], dtype=np.float32)]
 
     # Execute
     actual_aggregated, _ = strategy.aggregate_fit(
@@ -197,4 +197,4 @@ def test_aggregate_fit() -> None:
     assert actual_aggregated
     actual_list = parameters_to_ndarrays(actual_aggregated)
     actual = actual_list[0]
-    assert (actual == expected[0]).all()
+    assert np.array_equal(actual, expected[0])

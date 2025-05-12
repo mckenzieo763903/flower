@@ -188,7 +188,7 @@ def test_set_parameters_with_incorrect_types(
 )
 def test_set_metrics_to_metricrecord_with_correct_types(
     key_type: type[str],
-    value_fn: Callable[[NDArray], MetricRecordValues],
+    value_fn: Callable[[np.ndarray], MetricRecordValues],
 ) -> None:
     """Test adding metrics of various types to a MetricRecord."""
     m_record = MetricRecord()
