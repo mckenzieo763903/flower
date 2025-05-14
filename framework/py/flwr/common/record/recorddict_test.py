@@ -127,7 +127,7 @@ def test_parameters_to_arrayrecord_and_back(
     assert validate_freed_fn(parameters, parameters_copy, parameters_)
 
 
-def test_set_parameters_while_keeping_intputs() -> None:
+def test_set_parameters_while_keeping_inputs() -> None:
     """Test keep_input functionality in ArrayRecord."""
     # Adding parameters to a record that doesn't erase entries in the input `array_dict`
     array_dict = OrderedDict(
@@ -274,7 +274,7 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
     arrays = get_ndarrays()
     my_metrics = cast(
         dict[str, MetricRecordValues],
-        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},
+        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},  # type: ignore[attr-defined]
     )
     my_metrics_copy = my_metrics.copy()
 
@@ -330,11 +330,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         (str, lambda x: x),  # str: NDArray (supported: unsupported)
         (
             str,
-            lambda x: {str(v): v for v in x.flatten()},
+            lambda x: {str(v): v for v in x.flatten()},  # type: ignore[attr-defined]
         ),  # str: dict[str: float] (supported: unsupported)
         (
             str,
-            lambda x: [{str(v): v for v in x.flatten()}],
+            lambda x: [{str(v): v for v in x.flatten()}],  # type: ignore[attr-defined]
         ),  # str: List[dict[str: float]] (supported: unsupported)
         (
             str,
@@ -342,11 +342,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         ),  # str: List[mixing valid types] (supported: unsupported)
         (
             int,
-            lambda x: x.flatten().tolist(),
+            lambda x: x.flatten().tolist(),  # type: ignore[attr-defined]
         ),  # int: List[str] (unsupported: supported)
         (
             float,
-            lambda x: x.flatten().tolist(),
+            lambda x: x.flatten().tolist(),  # type: ignore[attr-defined]
         ),  # float: List[int] (unsupported: supported)
     ],
 )

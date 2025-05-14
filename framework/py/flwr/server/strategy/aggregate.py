@@ -228,14 +228,14 @@ def aggregate_qffl(
     demominator: float = np.sum(np.asarray(hs_fll))
     scaled_deltas = []
     for client_delta in deltas:
-        scaled_deltas.append([layer * 1.0 / demominator for layer in client_delta])
+        scaled_deltas.append([np.asarray(layer) * 1.0 / demominator for layer in client_delta])
     updates = []
     for i in range(len(deltas[0])):
         tmp = scaled_deltas[0][i]
         for j in range(1, len(deltas)):
-            tmp += scaled_deltas[j][i]
+            tmp = np.add(tmp, scaled_deltas[j][i])
         updates.append(tmp)
-    new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]
+    new_parameters = [np.asarray(u) - np.asarray(v) for u, v in zip(parameters, updates)]
     return new_parameters
 
 
@@ -249,7 +249,7 @@ def _compute_distances(weights: list[NDArrays]) -> NDArray:
     distance_matrix = np.zeros((len(weights), len(weights)))
     for i, flat_w_i in enumerate(flat_w):
         for j, flat_w_j in enumerate(flat_w):
-            delta = flat_w_i - flat_w_j
+            delta = np.subtract(flat_w_i, flat_w_j)
             norm = np.linalg.norm(delta)
             distance_matrix[i, j] = norm**2
     return distance_matrix
@@ -270,7 +270,7 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
     if lowercut > uppercut:
         raise ValueError("Proportion too big.")
 
-    atmp = np.partition(array, (lowercut, uppercut - 1), axis)
+    atmp = np.partition(np.asarray(array), (lowercut, uppercut - 1), axis)
 
     slice_list = [slice(None)] * atmp.ndim
     slice_list[axis] = slice(lowercut, uppercut)
@@ -298,7 +298,7 @@ def _check_weights_equality(weights1: NDArrays, weights2: NDArrays) -> bool:
     if len(weights1) != len(weights2):
         return False
     return all(
-        np.array_equal(layer_weights1, layer_weights2)
+        np.array_equal(np.asarray(layer_weights1), np.asarray(layer_weights2))
         for layer_weights1, layer_weights2 in zip(weights1, weights2)
     )
 
@@ -366,7 +366,7 @@ def _aggregate_n_closest_weights(
             other_weights_layer = other_w[layer_id]
             other_weights_layer_list.append(other_weights_layer)
         other_weights_layer_np = np.array(other_weights_layer_list)
-        diff_np = np.abs(layer_weights - other_weights_layer_np)
+        diff_np = np.abs(np.asarray(layer_weights) - other_weights_layer_np)
         # Create indices of the smallest differences
         # We do not need the exact order but just the beta closest weights
         # therefore np.argpartition is used instead of np.argsort
