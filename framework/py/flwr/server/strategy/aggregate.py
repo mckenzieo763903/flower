@@ -239,7 +239,7 @@ def aggregate_qffl(
     return new_parameters
 
 
-def _compute_distances(weights: list[NDArrays]) -> NDArray:
+def _compute_distances(weights: list[NDArrays]) -> np.ndarray:
     """Compute distances between vectors.
 
     Input: weights - list of weights vectors
@@ -255,7 +255,7 @@ def _compute_distances(weights: list[NDArrays]) -> NDArray:
     return distance_matrix
 
 
-def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
+def _trim_mean(array: np.ndarray, proportiontocut: float) -> np.ndarray:
     """Compute trimmed mean along axis=0.
 
     It is based on the scipy implementation.
@@ -274,7 +274,7 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
 
     slice_list = [slice(None)] * atmp.ndim
     slice_list[axis] = slice(lowercut, uppercut)
-    result: NDArray = np.mean(atmp[tuple(slice_list)], axis=axis)
+    result: np.ndarray = np.mean(atmp[tuple(slice_list)], axis=axis)
     return result
 
 

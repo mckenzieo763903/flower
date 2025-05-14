@@ -461,7 +461,7 @@ def _collect_masked_vectors(
     parameters = parameters_multiply(parameters, dq_ratio)
 
     # Quantize parameter update (vector)
-    quantized_parameters = quantize(
+    quantized_parameters: list[np.ndarray] = quantize(
         parameters, state.clipping_range, state.target_range
     )
 

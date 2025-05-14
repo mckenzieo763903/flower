@@ -31,7 +31,7 @@ from flwr.common.logger import log
 
 def get_norm(input_arrays: NDArrays) -> float:
     """Compute the L2 norm of the flattened input."""
-    array_norms = [np.linalg.norm(array.flat) for array in input_arrays]
+    array_norms = [np.linalg.norm(np.asarray(array).flat) for array in input_arrays]
     # pylint: disable=consider-using-generator
     return float(np.sqrt(sum([norm**2 for norm in array_norms])))
 
@@ -39,7 +39,8 @@ def get_norm(input_arrays: NDArrays) -> float:
 def add_gaussian_noise_inplace(input_arrays: NDArrays, std_dev: float) -> None:
     """Add Gaussian noise to each element of the input arrays."""
     for array in input_arrays:
-        noise = np.random.normal(0, std_dev, array.shape).astype(array.dtype)
+        np_array = np.asarray(array)
+        noise = np.random.normal(0, std_dev, np_array.shape).astype(np_array.dtype)
         array += noise
 
 
@@ -51,7 +52,9 @@ def clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> None:
     input_norm = get_norm(input_arrays)
     scaling_factor = min(1, clipping_norm / input_norm)
     for array in input_arrays:
-        array *= scaling_factor
+        np_array = np.asarray(array)
+        np.multiply(np_array, scaling_factor, out=np_array)
+        array[...] = np_array
 
 
 def compute_stdv(
@@ -70,11 +73,11 @@ def compute_clip_model_update(
     """Compute model update (param1 - param2) and clip it.
 
     Then add the clipped value to param1."""
-    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]
+    model_update = [np.subtract(np.asarray(x), np.asarray(y)) for (x, y) in zip(param1, param2)]
     clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
-        param1[i] = param2[i] + model_update[i]
+        param1[i] = np.asarray(param2[i]) + model_update[i]
 
 
 def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> bool:
@@ -86,7 +89,9 @@ def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -
     input_norm = get_norm(input_arrays)
     scaling_factor = min(1, clipping_norm / input_norm)
     for array in input_arrays:
-        array *= scaling_factor
+        np_array = np.asarray(array)
+        np.multiply(np_array, scaling_factor, out=np_array)
+        array[...] = np_array
     return scaling_factor < 1
 
 
@@ -98,11 +103,11 @@ def compute_adaptive_clip_model_update(
     model update = param1 - param2
     Return the norm_bit
     """
-    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]
+    model_update = [np.subtract(np.asarray(x), np.asarray(y)) for (x, y) in zip(param1, param2)]
     norm_bit = adaptive_clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
-        param1[i] = param2[i] + model_update[i]
+        param1[i] = np.asarray(param2[i]) + model_update[i]
 
     return norm_bit
 
@@ -115,6 +120,8 @@ def add_gaussian_noise_to_params(
 ) -> Parameters:
     """Add gaussian noise to model parameters."""
     model_params_ndarrays = parameters_to_ndarrays(model_params)
+    # Cast to np.ndarray to satisfy mypy type checking for .shape and .dtype
+    model_params_ndarrays = [np.asarray(arr) for arr in model_params_ndarrays]
     add_gaussian_noise_inplace(
         model_params_ndarrays,
         compute_stdv(noise_multiplier, clipping_norm, num_sampled_clients),
@@ -170,6 +177,8 @@ def add_localdp_gaussian_noise_to_params(
 ) -> Parameters:
     """Add local DP gaussian noise to model parameters."""
     model_params_ndarrays = parameters_to_ndarrays(model_params)
+    # Cast to np.ndarray to satisfy mypy type checking for .shape and .dtype
+    model_params_ndarrays = [np.asarray(arr) for arr in model_params_ndarrays]
     add_gaussian_noise_inplace(
         model_params_ndarrays,
         sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon,

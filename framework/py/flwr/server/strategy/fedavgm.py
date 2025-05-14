@@ -156,12 +156,15 @@ class FedAvgM(FedAvg):
                 self.initial_parameters is not None
             ), "When using server-side optimization, model needs to be initialized."
             initial_weights = parameters_to_ndarrays(self.initial_parameters)
+            assert initial_weights is not None, "initial_weights should not be None"
 
             # remember that updates are the opposite of gradients
+            initial_params_ndarrays = parameters_to_ndarrays(self.initial_parameters)
+            assert initial_params_ndarrays is not None, "initial_params_ndarrays should not be None"
             pseudo_gradient: NDArrays = [
                 x - y
                 for x, y in zip(
-                    parameters_to_ndarrays(self.initial_parameters), fedavg_result
+                    initial_params_ndarrays, fedavg_result
                 )
             ]
             if self.server_momentum > 0.0:
@@ -184,6 +187,7 @@ class FedAvgM(FedAvg):
                 x - self.server_learning_rate * y
                 for x, y in zip(initial_weights, pseudo_gradient)
             ]
+            assert fedavg_result is not None, "fedavg_result should not be None"
             # Update current weights
             self.initial_parameters = ndarrays_to_parameters(fedavg_result)
 
