@@ -173,6 +173,7 @@ def start_client_internal(
         (default: `CLIENTAPPIO_API_DEFAULT_SERVER_ADDRESS`)
         The SuperNode gRPC server address.
     """
+    # pylint: disable=too-many-arguments
     if insecure is None:
         insecure = root_certificates is None
 
