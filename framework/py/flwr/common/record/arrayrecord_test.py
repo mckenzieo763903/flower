@@ -39,7 +39,7 @@ from .arrayrecord import ArrayRecord
 
 def _get_buffer_from_ndarray(array: NDArray) -> bytes:
     """Return a bytes buffer froma given NumPy array."""
-    buffer = BytesIO()
+    buffer: io.BytesIO = BytesIO()
     np.save(buffer, array, allow_pickle=False)
     return buffer.getvalue()
 
@@ -48,9 +48,9 @@ class TorchTensor(Mock):
     """Mock Torch tensor class."""
 
 
-MOCK_TORCH_TENSOR = TorchTensor(numpy=lambda: np.array([[1, 2, 3]]))
-MOCK_TORCH_TENSOR.detach.return_value = MOCK_TORCH_TENSOR
-MOCK_TORCH_TENSOR.cpu.return_value = MOCK_TORCH_TENSOR
+MOCK_TORCH_TENSOR = TorchTensor(numpy=lambda: np.array([[1, 2, 3]]))  # type: ignore[assignment]
+MOCK_TORCH_TENSOR.detach.return_value = MOCK_TORCH_TENSOR  # type: ignore[assignment]
+MOCK_TORCH_TENSOR.cpu.return_value = MOCK_TORCH_TENSOR  # type: ignore[assignment]
 
 
 class TestArrayRecord(unittest.TestCase):
@@ -109,7 +109,7 @@ class TestArrayRecord(unittest.TestCase):
         for tensor_mock, numpy_array in zip(state_dict.values(), ndarrays):
             tensor_mock.detach.return_value = tensor_mock
             tensor_mock.cpu.return_value = tensor_mock
-            tensor_mock.numpy.return_value = numpy_array
+            tensor_mock.numpy.return_value = np.asarray(numpy_array, dtype=numpy_array.dtype)
 
         # Mock Array.from_numpy_ndarray to return mock arrays
         mock_arrays = [Mock(spec=Array), Mock(spec=Array)]
@@ -144,7 +144,7 @@ class TestArrayRecord(unittest.TestCase):
         numpy_arrays = [np.array([1, 2]), np.array([3, 4])]
         mock_arrays = [Mock(spec=Array), Mock(spec=Array)]
         for mock_arr, arr in zip(mock_arrays, numpy_arrays):
-            mock_arr.numpy.return_value = arr
+            mock_arr.numpy.return_value = np.asarray(arr, dtype=arr.dtype)
         record["0"] = mock_arrays[0]
         record["1"] = mock_arrays[1]
 
@@ -166,7 +166,7 @@ class TestArrayRecord(unittest.TestCase):
         ndarrays = [np.array([1, 2]), np.array([3, 4])]
         mock_arrays = [Mock(spec=Array), Mock(spec=Array)]
         for mock_arr, arr in zip(mock_arrays, ndarrays):
-            mock_arr.numpy.return_value = arr
+            mock_arr.numpy.return_value = np.asarray(arr, dtype=arr.dtype)
         record["weight"] = mock_arrays[0]
         record["bias"] = mock_arrays[1]
 
@@ -408,7 +408,7 @@ class TestArrayRecord(unittest.TestCase):
 )
 def test_count_bytes(shape: tuple[int, ...], dtype: str) -> None:
     """Test bytes in a ArrayRecord are computed correctly."""
-    original_array = np.random.randn(*shape).astype(np.dtype(dtype))
+    original_array = np.random.randn(*shape).astype(np.dtype(dtype).name)
 
     buff = ndarray_to_bytes(original_array)
 

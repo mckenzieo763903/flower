@@ -212,7 +212,6 @@ class ArrayRecord(TypedDict[str, Array], InflatableObject):
         # Handle NumPy ndarrays
         if not init_method or init_method == "numpy_ndarrays":
             # Type check the input
-            # pylint: disable-next=not-an-iterable
             if isinstance(arg, list) and all(isinstance(v, np.ndarray) for v in arg):
                 numpy_ndarrays = cast(list[NDArray], arg)
                 converted = self.from_numpy_ndarrays(
@@ -231,7 +230,7 @@ class ArrayRecord(TypedDict[str, Array], InflatableObject):
                 and all(isinstance(v, torch.Tensor) for v in arg.values())
             ):
                 torch_state_dict = cast(
-                    OrderedDict[str, torch.Tensor], arg  # type: ignore
+                    OrderedDict[str, torch.Tensor], arg
                 )
                 converted = self.from_torch_state_dict(
                     torch_state_dict, keep_input=keep_input

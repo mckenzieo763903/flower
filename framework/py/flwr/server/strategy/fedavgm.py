@@ -113,8 +113,10 @@ class FedAvgM(FedAvg):
         )
         self.server_learning_rate = server_learning_rate
         self.server_momentum = server_momentum
-        self.server_opt: bool = (self.server_momentum != 0.0) or (
-            self.server_learning_rate != 1.0
+        self.server_opt: bool = (
+            float(self.server_momentum) != 0.0
+        ) or (
+            float(self.server_learning_rate) != 1.0
         )
         self.momentum_vector: Optional[NDArrays] = None
 
@@ -159,7 +161,7 @@ class FedAvgM(FedAvg):
 
             # remember that updates are the opposite of gradients
             pseudo_gradient: NDArrays = [
-                x - y
+                float(x) - float(y)
                 for x, y in zip(
                     parameters_to_ndarrays(self.initial_parameters), fedavg_result
                 )
@@ -170,7 +172,7 @@ class FedAvgM(FedAvg):
                         self.momentum_vector
                     ), "Momentum should have been created on round 1."
                     self.momentum_vector = [
-                        self.server_momentum * x + y
+                        float(self.server_momentum * x) + float(y)
                         for x, y in zip(self.momentum_vector, pseudo_gradient)
                     ]
                 else:
@@ -181,7 +183,7 @@ class FedAvgM(FedAvg):
 
             # SGD
             fedavg_result = [
-                x - self.server_learning_rate * y
+                float(x) - float(self.server_learning_rate * y)
                 for x, y in zip(initial_weights, pseudo_gradient)
             ]
             # Update current weights

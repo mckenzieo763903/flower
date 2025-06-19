@@ -32,7 +32,7 @@ from flwr.common import (
 )
 from flwr.common import recorddict_compat as compat
 from flwr.common.constant import MessageType
-from flwr.common.logger import log
+from flwr.common.logger import log, mask_string
 from flwr.common.secure_aggregation.crypto.shamir import create_shares
 from flwr.common.secure_aggregation.crypto.symmetric_encryption import (
     bytes_to_private_key,
@@ -50,6 +50,13 @@ from flwr.common.secure_aggregation.ndarrays_arithmetic import (
     parameters_mod,
     parameters_multiply,
     parameters_subtraction,
+)
+from flwr.common.secure_aggregation.ndarrays_arithmetic import (
+    factor_combine as _factor_combine,
+    parameters_addition as _parameters_addition,
+    parameters_mod as _parameters_mod,
+    parameters_multiply as _parameters_multiply,
+    parameters_subtraction as _parameters_subtraction,
 )
 from flwr.common.secure_aggregation.quantization import quantize
 from flwr.common.secure_aggregation.secaggplus_constants import (
@@ -465,13 +472,15 @@ def _collect_masked_vectors(
         parameters, state.clipping_range, state.target_range
     )
 
-    quantized_parameters = factor_combine(q_ratio, quantized_parameters)
+    quantized_parameters = _factor_combine(q_ratio, quantized_parameters)
 
-    dimensions_list: list[tuple[int, ...]] = [a.shape for a in quantized_parameters]
+    dimensions_list: list[tuple[int, ...]] = [
+        _shape_tuple(a) for a in quantized_parameters
+    ]
 
     # Add private mask
     private_mask = pseudo_rand_gen(state.rd_seed, state.mod_range, dimensions_list)
-    quantized_parameters = parameters_addition(quantized_parameters, private_mask)
+    quantized_parameters = _parameters_addition(quantized_parameters, private_mask)
 
     for node_id in available_clients:
         # Add pairwise masks

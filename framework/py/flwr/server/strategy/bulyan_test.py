@@ -122,7 +122,7 @@ def test_aggregate_fit() -> None:
 
     # Execute
     actual_aggregated, _ = strategy.aggregate_fit(
-        server_round=1, results=results, failures=[]
+        server_round=1, results=results
     )
     assert actual_aggregated
     actual_list = parameters_to_ndarrays(actual_aggregated)
