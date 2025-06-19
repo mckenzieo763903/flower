@@ -21,8 +21,19 @@ from logging import DEBUG, INFO
 from flwr.common.args import add_args_flwr_app_common
 from flwr.common.constant import CLIENTAPPIO_API_DEFAULT_CLIENT_ADDRESS
 from flwr.common.exit import ExitCode, flwr_exit
-from flwr.common.logger import log, mask_string
+from flwr.common.logger import log
 from flwr.supernode.runtime.run_clientapp import run_clientapp
+
+
+def mask_string(value: str, head: int = 4, tail: int = 4) -> str:
+    """Mask a string by preserving only the head and tail characters.
+
+    Show only the first `head` and last `tail` characters and replace the middle
+    with '...'. Useful for logging sensitive identifiers such as tokens.
+    """
+    if len(value) <= head + tail:
+        return value
+    return f"{value[:head]}...{value[-tail:]}"
 
 
 def flwr_clientapp() -> None:

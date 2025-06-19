@@ -70,7 +70,9 @@ def test_ndarray_to_array() -> None:
 
     array = ndarray_to_array(arr)
 
-    arr_ = np.frombuffer(buffer=array.data, dtype=array.dtype).reshape(array.shape)
+    arr_ = np.reshape(
+        np.frombuffer(buffer=array.data, dtype=array.dtype), array.shape
+    )
 
     assert np.array_equal(arr, arr_)
 
@@ -274,7 +276,10 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
     arrays = get_ndarrays()
     my_metrics = cast(
         dict[str, MetricRecordValues],
-        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},
+        {
+            str(label): list(map(float, np.ravel(arr)))
+            for label, arr in zip(labels, arrays)
+        },
     )
     my_metrics_copy = my_metrics.copy()
 

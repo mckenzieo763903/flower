@@ -425,3 +425,25 @@ def print_json_error(msg: str, e: Union[typer.Exit, Exception]) -> None:
             }
         )
     )
+
+
+def mask_string(value: str, head: int = 4, tail: int = 4) -> str:
+    """Mask a string, keeping only the first `head` and last `tail` characters.
+
+    Parameters
+    ----------
+    value : str
+        The string to mask.
+    head : int (default: 4)
+        Number of leading characters to keep.
+    tail : int (default: 4)
+        Number of trailing characters to keep.
+
+    Returns
+    -------
+    str
+        The masked string, or the original string if it is too short to mask.
+    """
+    if len(value) <= head + tail:
+        return value
+    return f"{value[:head]}...{value[-tail:]}"
