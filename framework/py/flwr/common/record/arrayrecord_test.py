@@ -412,7 +412,7 @@ def test_count_bytes(shape: tuple[int, ...], dtype: str) -> None:
 
     buff = ndarray_to_bytes(original_array)
 
-    buffer = _get_buffer_from_ndarray(original_array)
+    buffer = _get_buffer_from_ndarray(np.asarray(original_array))
 
     array_instance = Array(
         dtype=str(original_array.dtype),

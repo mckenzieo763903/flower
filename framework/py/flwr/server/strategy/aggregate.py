@@ -235,7 +235,7 @@ def aggregate_qffl(
         for j in range(1, len(deltas)):
             tmp += scaled_deltas[j][i]
         updates.append(tmp)
-    new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]
+    new_parameters = [np.subtract(u, v) * 1.0 for u, v in zip(parameters, updates)]
     return new_parameters
 
 
@@ -249,7 +249,7 @@ def _compute_distances(weights: list[NDArrays]) -> NDArray:
     distance_matrix = np.zeros((len(weights), len(weights)))
     for i, flat_w_i in enumerate(flat_w):
         for j, flat_w_j in enumerate(flat_w):
-            delta = flat_w_i - flat_w_j
+            delta = np.subtract(flat_w_i, flat_w_j)
             norm = np.linalg.norm(delta)
             distance_matrix[i, j] = norm**2
     return distance_matrix
@@ -264,13 +264,14 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
     scipy.stats.trim_mean.html.
     """
     axis = 0
-    nobs = array.shape[axis]
+    array_np = np.asarray(array)
+    nobs = array_np.shape[axis]
     lowercut = int(proportiontocut * nobs)
     uppercut = nobs - lowercut
     if lowercut > uppercut:
         raise ValueError("Proportion too big.")
 
-    atmp = np.partition(array, (lowercut, uppercut - 1), axis)
+    atmp = np.partition(array_np, (lowercut, uppercut - 1), axis)
 
     slice_list = [slice(None)] * atmp.ndim
     slice_list[axis] = slice(lowercut, uppercut)
@@ -298,7 +299,7 @@ def _check_weights_equality(weights1: NDArrays, weights2: NDArrays) -> bool:
     if len(weights1) != len(weights2):
         return False
     return all(
-        np.array_equal(layer_weights1, layer_weights2)
+        np.array_equal(np.asarray(layer_weights1), np.asarray(layer_weights2))
         for layer_weights1, layer_weights2 in zip(weights1, weights2)
     )
 
@@ -366,7 +367,8 @@ def _aggregate_n_closest_weights(
             other_weights_layer = other_w[layer_id]
             other_weights_layer_list.append(other_weights_layer)
         other_weights_layer_np = np.array(other_weights_layer_list)
-        diff_np = np.abs(layer_weights - other_weights_layer_np)
+        layer_weights_np = np.asarray(layer_weights)
+        diff_np = np.abs(np.subtract(layer_weights_np, other_weights_layer_np))
         # Create indices of the smallest differences
         # We do not need the exact order but just the beta closest weights
         # therefore np.argpartition is used instead of np.argsort

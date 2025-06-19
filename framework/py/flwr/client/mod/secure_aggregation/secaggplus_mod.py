@@ -467,7 +467,7 @@ def _collect_masked_vectors(
 
     quantized_parameters = factor_combine(q_ratio, quantized_parameters)
 
-    dimensions_list: list[tuple[int, ...]] = [a.shape for a in quantized_parameters]
+    dimensions_list: list[tuple[int, ...]] = [arr.shape for arr in quantized_parameters]
 
     # Add private mask
     private_mask = pseudo_rand_gen(state.rd_seed, state.mod_range, dimensions_list)

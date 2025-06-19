@@ -31,7 +31,7 @@ from flwr.common.logger import log
 
 def get_norm(input_arrays: NDArrays) -> float:
     """Compute the L2 norm of the flattened input."""
-    array_norms = [np.linalg.norm(array.flat) for array in input_arrays]
+    array_norms = [np.linalg.norm(array.flatten()) for array in input_arrays]
     # pylint: disable=consider-using-generator
     return float(np.sqrt(sum([norm**2 for norm in array_norms])))
 
@@ -40,7 +40,7 @@ def add_gaussian_noise_inplace(input_arrays: NDArrays, std_dev: float) -> None:
     """Add Gaussian noise to each element of the input arrays."""
     for array in input_arrays:
         noise = np.random.normal(0, std_dev, array.shape).astype(array.dtype)
-        array += noise
+        array[:] = array + noise
 
 
 def clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> None:
@@ -51,7 +51,7 @@ def clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> None:
     input_norm = get_norm(input_arrays)
     scaling_factor = min(1, clipping_norm / input_norm)
     for array in input_arrays:
-        array *= scaling_factor
+        array[:] = array * scaling_factor
 
 
 def compute_stdv(
@@ -70,11 +70,11 @@ def compute_clip_model_update(
     """Compute model update (param1 - param2) and clip it.
 
     Then add the clipped value to param1."""
-    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]
+    model_update = [x - y for (x, y) in zip(param1, param2)]
     clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
-        param1[i] = param2[i] + model_update[i]
+        param1[i][:] = param2[i] + model_update[i]
 
 
 def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -> bool:
@@ -86,7 +86,7 @@ def adaptive_clip_inputs_inplace(input_arrays: NDArrays, clipping_norm: float) -
     input_norm = get_norm(input_arrays)
     scaling_factor = min(1, clipping_norm / input_norm)
     for array in input_arrays:
-        array *= scaling_factor
+        array[:] = array * scaling_factor
     return scaling_factor < 1
 
 
@@ -98,11 +98,11 @@ def compute_adaptive_clip_model_update(
     model update = param1 - param2
     Return the norm_bit
     """
-    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]
+    model_update = [x - y for (x, y) in zip(param1, param2)]
     norm_bit = adaptive_clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
-        param1[i] = param2[i] + model_update[i]
+        param1[i][:] = param2[i] + model_update[i]
 
     return norm_bit
 
