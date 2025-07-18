@@ -55,11 +55,7 @@ def aggregate_inplace(results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
     def _try_inplace(
         x: NDArray, y: Union[NDArray, np.float64], np_binary_op: np.ufunc
     ) -> NDArray:
-        return (  # type: ignore[no-any-return]
-            np_binary_op(x, y, out=x)
-            if np.can_cast(y, x.dtype, casting="same_kind")
-            else np_binary_op(x, np.array(y, x.dtype), out=x)
-        )
+        return np_binary_op(x, y, out=x) if np.can_cast(y, x.dtype, casting="same_kind") else np_binary_op(x, np.array(y, x.dtype), out=x)
 
     # Let's do in-place aggregation
     # Get first result, then add up each other
@@ -225,10 +221,10 @@ def aggregate_qffl(
     parameters: NDArrays, deltas: list[NDArrays], hs_fll: list[NDArrays]
 ) -> NDArrays:
     """Compute weighted average based on Q-FFL paper."""
-    demominator: float = np.sum(np.asarray(hs_fll))
+    denominator: float = np.sum(np.asarray(hs_fll))
     scaled_deltas = []
     for client_delta in deltas:
-        scaled_deltas.append([layer * 1.0 / demominator for layer in client_delta])
+        scaled_deltas.append([layer * 1.0 / denominator for layer in client_delta])
     updates = []
     for i in range(len(deltas[0])):
         tmp = scaled_deltas[0][i]

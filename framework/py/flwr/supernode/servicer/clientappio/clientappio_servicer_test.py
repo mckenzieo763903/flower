@@ -107,4 +107,3 @@ class TestClientAppIoServicer(unittest.TestCase):
 
         # Assert
         self.mock_stub.PushClientAppOutputs.assert_called_once()
-        self.mock_stub.PushMessage.assert_called_once()

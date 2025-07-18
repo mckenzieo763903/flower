@@ -161,7 +161,7 @@ class FedAvgM(FedAvg):
             pseudo_gradient: NDArrays = [
                 x - y
                 for x, y in zip(
-                    parameters_to_ndarrays(self.initial_parameters), fedavg_result
+                    initial_weights, fedavg_result
                 )
             ]
             if self.server_momentum > 0.0:

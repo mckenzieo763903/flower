@@ -198,7 +198,7 @@ def test_set_metrics_to_metricrecord_with_correct_types(
     arrays = get_ndarrays()
 
     my_metrics = OrderedDict(
-        {key_type(label): value_fn(arr) for label, arr in zip(labels, arrays)}
+        {key_type(label): value_fn(np.asarray(arr)) for label, arr in zip(labels, arrays)}
     )
 
     # Add metric
@@ -255,7 +255,7 @@ def test_set_metrics_to_metricrecord_with_incorrect_types(
     )
 
     with pytest.raises(TypeError):
-        m_record.update(my_metrics)  # type: ignore
+        m_record.update(my_metrics)
 
 
 @pytest.mark.parametrize(
@@ -293,16 +293,16 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
 @pytest.mark.parametrize(
     "key_type, value_fn",
     [
-        (str, lambda x: str(x.flatten()[0])),  # str: str
-        (str, lambda x: int(x.flatten()[0])),  # str: int
-        (str, lambda x: float(x.flatten()[0])),  # str: float
-        (str, lambda x: bool(x.flatten()[0])),  # str: bool
-        (str, lambda x: x.flatten().tobytes()),  # str: bytes
-        (str, lambda x: x.flatten().astype("str").tolist()),  # str: List[str]
-        (str, lambda x: x.flatten().astype("int").tolist()),  # str: List[int]
-        (str, lambda x: x.flatten().astype("float").tolist()),  # str: List[float]
-        (str, lambda x: x.flatten().astype("bool").tolist()),  # str: List[bool]
-        (str, lambda x: [x.flatten().tobytes()]),  # str: List[bytes]
+        (str, lambda x: str(np.asarray(x).flatten()[0])),  # str: str
+        (str, lambda x: int(np.asarray(x).flatten()[0])),  # str: int
+        (str, lambda x: float(np.asarray(x).flatten()[0])),  # str: float
+        (str, lambda x: bool(np.asarray(x).flatten()[0])),  # str: bool
+        (str, lambda x: np.asarray(x).flatten().tobytes()),  # str: bytes
+        (str, lambda x: np.asarray(x).flatten().astype("str").tolist()),  # str: List[str]
+        (str, lambda x: np.asarray(x).flatten().astype("int").tolist()),  # str: List[int]
+        (str, lambda x: np.asarray(x).flatten().astype("float").tolist()),  # str: List[float]
+        (str, lambda x: np.asarray(x).flatten().astype("bool").tolist()),  # str: List[bool]
+        (str, lambda x: [np.asarray(x).flatten().tobytes()]),  # str: List[bytes]
         (str, lambda x: []),  # str: emptyt list
     ],
 )
@@ -330,11 +330,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         (str, lambda x: x),  # str: NDArray (supported: unsupported)
         (
             str,
-            lambda x: {str(v): v for v in x.flatten()},
+            lambda x: {str(v): v for v in np.asarray(x).flatten()},
         ),  # str: dict[str: float] (supported: unsupported)
         (
             str,
-            lambda x: [{str(v): v for v in x.flatten()}],
+            lambda x: [{str(v): v for v in np.asarray(x).flatten()}],
         ),  # str: List[dict[str: float]] (supported: unsupported)
         (
             str,
@@ -342,11 +342,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         ),  # str: List[mixing valid types] (supported: unsupported)
         (
             int,
-            lambda x: x.flatten().tolist(),
+            lambda x: np.asarray(x).flatten().tolist(),
         ),  # int: List[str] (unsupported: supported)
         (
             float,
-            lambda x: x.flatten().tolist(),
+            lambda x: np.asarray(x).flatten().tolist(),
         ),  # float: List[int] (unsupported: supported)
     ],
 )
@@ -365,7 +365,7 @@ def test_set_configs_to_configrecord_with_incorrect_types(
     )
 
     with pytest.raises(TypeError):
-        c_record.update(my_configs)  # type: ignore
+        c_record.update(my_configs)
 
 
 def test_count_bytes_metricrecord() -> None:
