@@ -33,6 +33,12 @@ from flwr.common import ndarray_to_bytes
 from ..constant import SType
 from ..inflatable import get_object_body, get_object_type_from_object_content
 from ..typing import NDArray
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray as _NDArray
+else:
+    _NDArray = NDArray
 from .array import Array
 from .arrayrecord import ArrayRecord
 
@@ -70,7 +76,7 @@ class TestArrayRecord(unittest.TestCase):
         if self._original_torch is not None:
             sys.modules["torch"] = self._original_torch
 
-    @parameterized.expand(  # type: ignore
+    @parameterized.expand(
         [
             ([np.array([1, 2]), np.array([3, 4])],),  # Two arrays
             ([np.array(5)],),  # Single array
@@ -408,7 +414,7 @@ class TestArrayRecord(unittest.TestCase):
 )
 def test_count_bytes(shape: tuple[int, ...], dtype: str) -> None:
     """Test bytes in a ArrayRecord are computed correctly."""
-    original_array = np.random.randn(*shape).astype(np.dtype(dtype))
+    original_array = np.random.randn(*shape).astype(np.dtype(dtype))  # type: ignore[union-attr]
 
     buff = ndarray_to_bytes(original_array)
 

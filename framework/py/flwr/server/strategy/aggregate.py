@@ -39,7 +39,7 @@ def aggregate(results: list[tuple[NDArrays, int]]) -> NDArrays:
         reduce(np.add, layer_updates) / num_examples_total
         for layer_updates in zip(*weighted_weights)
     ]
-    return weights_prime
+    return weights_prime  # type: ignore[return-value]
 
 
 def aggregate_inplace(results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
@@ -78,7 +78,7 @@ def aggregate_inplace(results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
             for layer_updates in zip(params, res)
         ]
 
-    return params
+    return params  # type: ignore[return-value]
 
 
 def aggregate_median(results: list[tuple[NDArrays, int]]) -> NDArrays:
@@ -90,7 +90,7 @@ def aggregate_median(results: list[tuple[NDArrays, int]]) -> NDArrays:
     median_w: NDArrays = [
         np.median(np.asarray(layer), axis=0) for layer in zip(*weights)
     ]
-    return median_w
+    return median_w  # type: ignore[return-value]
 
 
 def aggregate_krum(
@@ -125,10 +125,10 @@ def aggregate_krum(
         # Choose to_keep clients and return their average (MultiKrum)
         best_indices = np.argsort(scores)[::-1][len(scores) - to_keep :]  # noqa: E203
         best_results = [results[i] for i in best_indices]
-        return aggregate(best_results)
+        return aggregate(best_results)  # type: ignore[return-value]
 
     # Return the model parameters that minimize the score (Krum)
-    return weights[np.argmin(scores)]
+    return weights[np.argmin(scores)]  # type: ignore[return-value]
 
 
 # pylint: disable=too-many-locals
@@ -211,7 +211,7 @@ def aggregate_bulyan(
     parameters_aggregated = _aggregate_n_closest_weights(
         median_vect, selected_models_set, beta_closest=beta
     )
-    return parameters_aggregated
+    return parameters_aggregated  # type: ignore[return-value]
 
 
 def weighted_loss_avg(results: list[tuple[int, float]]) -> float:
@@ -236,7 +236,7 @@ def aggregate_qffl(
             tmp += scaled_deltas[j][i]
         updates.append(tmp)
     new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]
-    return new_parameters
+    return new_parameters  # type: ignore[return-value]
 
 
 def _compute_distances(weights: list[NDArrays]) -> NDArray:

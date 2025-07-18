@@ -31,7 +31,7 @@ from flwr.common.logger import log
 
 def get_norm(input_arrays: NDArrays) -> float:
     """Compute the L2 norm of the flattened input."""
-    array_norms = [np.linalg.norm(array.flat) for array in input_arrays]
+    array_norms = [np.linalg.norm(array.flat) for array in input_arrays]  # type: ignore[attr-defined]
     # pylint: disable=consider-using-generator
     return float(np.sqrt(sum([norm**2 for norm in array_norms])))
 
@@ -39,7 +39,7 @@ def get_norm(input_arrays: NDArrays) -> float:
 def add_gaussian_noise_inplace(input_arrays: NDArrays, std_dev: float) -> None:
     """Add Gaussian noise to each element of the input arrays."""
     for array in input_arrays:
-        noise = np.random.normal(0, std_dev, array.shape).astype(array.dtype)
+        noise = np.random.normal(0, std_dev, array.shape).astype(array.dtype)  # type: ignore[attr-defined]
         array += noise
 
 
@@ -70,7 +70,7 @@ def compute_clip_model_update(
     """Compute model update (param1 - param2) and clip it.
 
     Then add the clipped value to param1."""
-    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]
+    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]  # type: ignore[operator]
     clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
@@ -98,7 +98,7 @@ def compute_adaptive_clip_model_update(
     model update = param1 - param2
     Return the norm_bit
     """
-    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]
+    model_update = [np.subtract(x, y) for (x, y) in zip(param1, param2)]  # type: ignore[operator]
     norm_bit = adaptive_clip_inputs_inplace(model_update, clipping_norm)
 
     for i, _ in enumerate(param2):
@@ -115,7 +115,7 @@ def add_gaussian_noise_to_params(
 ) -> Parameters:
     """Add gaussian noise to model parameters."""
     model_params_ndarrays = parameters_to_ndarrays(model_params)
-    add_gaussian_noise_inplace(
+    add_gaussian_noise_inplace(  # type: ignore[arg-type]
         model_params_ndarrays,
         compute_stdv(noise_multiplier, clipping_norm, num_sampled_clients),
     )
@@ -170,7 +170,7 @@ def add_localdp_gaussian_noise_to_params(
 ) -> Parameters:
     """Add local DP gaussian noise to model parameters."""
     model_params_ndarrays = parameters_to_ndarrays(model_params)
-    add_gaussian_noise_inplace(
+    add_gaussian_noise_inplace(  # type: ignore[arg-type]
         model_params_ndarrays,
         sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon,
     )
