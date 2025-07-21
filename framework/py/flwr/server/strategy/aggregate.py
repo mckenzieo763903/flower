@@ -55,11 +55,7 @@ def aggregate_inplace(results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
     def _try_inplace(
         x: NDArray, y: Union[NDArray, np.float64], np_binary_op: np.ufunc
     ) -> NDArray:
-        return (  # type: ignore[no-any-return]
-            np_binary_op(x, y, out=x)
-            if np.can_cast(y, x.dtype, casting="same_kind")
-            else np_binary_op(x, np.array(y, x.dtype), out=x)
-        )
+        return np_binary_op(x, y, out=x) if np.can_cast(y, x.dtype, casting="same_kind") else np_binary_op(x, np.array(y, x.dtype), out=x)
 
     # Let's do in-place aggregation
     # Get first result, then add up each other
@@ -235,7 +231,7 @@ def aggregate_qffl(
         for j in range(1, len(deltas)):
             tmp += scaled_deltas[j][i]
         updates.append(tmp)
-    new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]
+    new_parameters = [np.subtract(u, v) * 1.0 for u, v in zip(parameters, updates)]
     return new_parameters
 
 
@@ -263,14 +259,15 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
     https://docs.scipy.org/doc/scipy/reference/generated/
     scipy.stats.trim_mean.html.
     """
+    array_np = np.asarray(array)
     axis = 0
-    nobs = array.shape[axis]
+    nobs = array_np.shape[axis]
     lowercut = int(proportiontocut * nobs)
     uppercut = nobs - lowercut
     if lowercut > uppercut:
         raise ValueError("Proportion too big.")
 
-    atmp = np.partition(array, (lowercut, uppercut - 1), axis)
+    atmp = np.partition(array_np, (lowercut, uppercut - 1), axis)
 
     slice_list = [slice(None)] * atmp.ndim
     slice_list[axis] = slice(lowercut, uppercut)
@@ -286,7 +283,7 @@ def aggregate_trimmed_avg(
     weights = [weights for weights, _ in results]
 
     trimmed_w: NDArrays = [
-        _trim_mean(np.asarray(layer), proportiontocut=proportiontocut)
+        _trim_mean(layer, proportiontocut=proportiontocut)
         for layer in zip(*weights)
     ]
 
@@ -298,7 +295,7 @@ def _check_weights_equality(weights1: NDArrays, weights2: NDArrays) -> bool:
     if len(weights1) != len(weights2):
         return False
     return all(
-        np.array_equal(layer_weights1, layer_weights2)
+        np.array_equal(np.asarray(layer_weights1), np.asarray(layer_weights2))
         for layer_weights1, layer_weights2 in zip(weights1, weights2)
     )
 
@@ -366,7 +363,8 @@ def _aggregate_n_closest_weights(
             other_weights_layer = other_w[layer_id]
             other_weights_layer_list.append(other_weights_layer)
         other_weights_layer_np = np.array(other_weights_layer_list)
-        diff_np = np.abs(layer_weights - other_weights_layer_np)
+        layer_weights_np = np.asarray(layer_weights)
+        diff_np = np.abs(layer_weights_np - other_weights_layer_np)
         # Create indices of the smallest differences
         # We do not need the exact order but just the beta closest weights
         # therefore np.argpartition is used instead of np.argsort
