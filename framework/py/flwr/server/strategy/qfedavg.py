@@ -193,6 +193,8 @@ class QFedAvg(FedAvg):
         )
         if eval_result is not None:
             loss, _ = eval_result
+        else:
+            loss = 0.0
 
         for _, fit_res in results:
             new_weights = parameters_to_ndarrays(fit_res.parameters)

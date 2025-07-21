@@ -186,6 +186,8 @@ class FedAvgM(FedAvg):
             ]
             # Update current weights
             self.initial_parameters = ndarrays_to_parameters(fedavg_result)
+            # Re-assign fedavg_result to the updated weights for consistency
+            fedavg_result = initial_weights
 
         parameters_aggregated = ndarrays_to_parameters(fedavg_result)
 
