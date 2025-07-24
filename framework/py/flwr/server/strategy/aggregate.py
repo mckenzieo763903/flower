@@ -55,11 +55,7 @@ def aggregate_inplace(results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
     def _try_inplace(
         x: NDArray, y: Union[NDArray, np.float64], np_binary_op: np.ufunc
     ) -> NDArray:
-        return (  # type: ignore[no-any-return]
-            np_binary_op(x, y, out=x)
-            if np.can_cast(y, x.dtype, casting="same_kind")
-            else np_binary_op(x, np.array(y, x.dtype), out=x)
-        )
+        return np_binary_op(x, y, out=x) if np.can_cast(y, x.dtype, casting="same_kind") else np_binary_op(x, np.array(y, x.dtype), out=x)
 
     # Let's do in-place aggregation
     # Get first result, then add up each other
@@ -235,7 +231,7 @@ def aggregate_qffl(
         for j in range(1, len(deltas)):
             tmp += scaled_deltas[j][i]
         updates.append(tmp)
-    new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]
+    new_parameters = [np.subtract(u, v) * 1.0 for u, v in zip(parameters, updates)]
     return new_parameters
 
 
@@ -275,7 +271,7 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
     slice_list = [slice(None)] * atmp.ndim
     slice_list[axis] = slice(lowercut, uppercut)
     result: NDArray = np.mean(atmp[tuple(slice_list)], axis=axis)
-    return result
+    return result  # type: ignore[no-any-return]
 
 
 def aggregate_trimmed_avg(
@@ -290,7 +286,7 @@ def aggregate_trimmed_avg(
         for layer in zip(*weights)
     ]
 
-    return trimmed_w
+    return trimmed_w  # type: ignore[no-any-return]
 
 
 def _check_weights_equality(weights1: NDArrays, weights2: NDArrays) -> bool:
@@ -300,7 +296,7 @@ def _check_weights_equality(weights1: NDArrays, weights2: NDArrays) -> bool:
     return all(
         np.array_equal(layer_weights1, layer_weights2)
         for layer_weights1, layer_weights2 in zip(weights1, weights2)
-    )
+    )  # type: ignore[no-any-return]
 
 
 def _find_reference_weights(
@@ -330,7 +326,7 @@ def _find_reference_weights(
     for idx, weights in enumerate(list_of_weights):
         if _check_weights_equality(reference_weights, weights):
             return idx
-    raise ValueError("The reference weights not found in list_of_weights.")
+    raise ValueError("The reference weights not found in list_of_weights.")  # type: ignore[no-any-return]
 
 
 def _aggregate_n_closest_weights(
@@ -377,4 +373,4 @@ def _aggregate_n_closest_weights(
             other_weights_layer_np, indices=indices, axis=0
         )[:beta_closest]
         aggregated_weights.append(np.mean(beta_closest_weights, axis=0))
-    return aggregated_weights
+    return aggregated_weights  # type: ignore[no-any-return]

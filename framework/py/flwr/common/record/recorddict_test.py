@@ -274,7 +274,7 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
     arrays = get_ndarrays()
     my_metrics = cast(
         dict[str, MetricRecordValues],
-        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},
+        {str(label): np.asarray(arr).flatten().tolist() for label, arr in zip(labels, arrays)},
     )
     my_metrics_copy = my_metrics.copy()
 
@@ -315,7 +315,7 @@ def test_set_configs_to_configrecord_with_correct_types(
     arrays = get_ndarrays()
 
     my_configs = OrderedDict(
-        {key_type(label): value_fn(arr) for label, arr in zip(labels, arrays)}
+        {key_type(label): value_fn(np.asarray(arr)) for label, arr in zip(labels, arrays)}
     )
 
     c_record = ConfigRecord(my_configs)
@@ -330,11 +330,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         (str, lambda x: x),  # str: NDArray (supported: unsupported)
         (
             str,
-            lambda x: {str(v): v for v in x.flatten()},
+            lambda x: {str(v): v for v in np.asarray(x).flatten()},
         ),  # str: dict[str: float] (supported: unsupported)
         (
             str,
-            lambda x: [{str(v): v for v in x.flatten()}],
+            lambda x: [{str(v): v for v in np.asarray(x).flatten()}],
         ),  # str: List[dict[str: float]] (supported: unsupported)
         (
             str,
@@ -342,11 +342,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         ),  # str: List[mixing valid types] (supported: unsupported)
         (
             int,
-            lambda x: x.flatten().tolist(),
+            lambda x: np.asarray(x).flatten().tolist(),
         ),  # int: List[str] (unsupported: supported)
         (
             float,
-            lambda x: x.flatten().tolist(),
+            lambda x: np.asarray(x).flatten().tolist(),
         ),  # float: List[int] (unsupported: supported)
     ],
 )
