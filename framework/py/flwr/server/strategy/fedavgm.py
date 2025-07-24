@@ -158,7 +158,7 @@ class FedAvgM(FedAvg):
             initial_weights = parameters_to_ndarrays(self.initial_parameters)
 
             # remember that updates are the opposite of gradients
-            pseudo_gradient: NDArrays = [
+            pseudo_gradient: list[np.ndarray] = [
                 x - y
                 for x, y in zip(
                     parameters_to_ndarrays(self.initial_parameters), fedavg_result
@@ -167,7 +167,7 @@ class FedAvgM(FedAvg):
             if self.server_momentum > 0.0:
                 if server_round > 1:
                     assert (
-                        self.momentum_vector
+                        self.momentum_vector is not None
                     ), "Momentum should have been created on round 1."
                     self.momentum_vector = [
                         self.server_momentum * x + y
