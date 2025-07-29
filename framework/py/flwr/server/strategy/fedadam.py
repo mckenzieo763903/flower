@@ -150,6 +150,10 @@ class FedAdam(FedOpt):
         fedavg_weights_aggregate = parameters_to_ndarrays(fedavg_parameters_aggregated)
 
         # Adam
+        # Ensure current_weights is initialized to avoid type errors with optional types
+        if self.current_weights is None:
+            self.current_weights = [np.zeros_like(x) for x in fedavg_weights_aggregate]
+
         delta_t: NDArrays = [
             x - y for x, y in zip(fedavg_weights_aggregate, self.current_weights)
         ]
