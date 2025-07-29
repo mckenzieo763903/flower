@@ -16,17 +16,19 @@
 
 
 from logging import WARNING
-from typing import Optional
+from typing import List, Optional
 
 import numpy as np
+import numpy.typing as npt
 
 from flwr.common import (
-    NDArrays,
     Parameters,
     ndarrays_to_parameters,
     parameters_to_ndarrays,
 )
 from flwr.common.logger import log
+
+NDArrays = List[npt.NDArray[np.floating]]
 
 
 def get_norm(input_arrays: NDArrays) -> float:

@@ -55,11 +55,7 @@ def aggregate_inplace(results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
     def _try_inplace(
         x: NDArray, y: Union[NDArray, np.float64], np_binary_op: np.ufunc
     ) -> NDArray:
-        return (  # type: ignore[no-any-return]
-            np_binary_op(x, y, out=x)
-            if np.can_cast(y, x.dtype, casting="same_kind")
-            else np_binary_op(x, np.array(y, x.dtype), out=x)
-        )
+        return np_binary_op(x, y, out=x) if np.can_cast(y, x.dtype, casting="same_kind") else np_binary_op(x, np.array(y, x.dtype), out=x)
 
     # Let's do in-place aggregation
     # Get first result, then add up each other
@@ -226,14 +222,14 @@ def aggregate_qffl(
 ) -> NDArrays:
     """Compute weighted average based on Q-FFL paper."""
     demominator: float = np.sum(np.asarray(hs_fll))
-    scaled_deltas = []
+    scaled_deltas: list[list[np.ndarray]] = []
     for client_delta in deltas:
-        scaled_deltas.append([layer * 1.0 / demominator for layer in client_delta])
-    updates = []
+        scaled_deltas.append([np.asarray(layer) * 1.0 / demominator for layer in client_delta])
+    updates: list[np.ndarray] = []
     for i in range(len(deltas[0])):
-        tmp = scaled_deltas[0][i]
+        tmp: np.ndarray = scaled_deltas[0][i]
         for j in range(1, len(deltas)):
-            tmp += scaled_deltas[j][i]
+            tmp = tmp + scaled_deltas[j][i]
         updates.append(tmp)
     new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]
     return new_parameters
@@ -255,7 +251,7 @@ def _compute_distances(weights: list[NDArrays]) -> NDArray:
     return distance_matrix
 
 
-def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
+def _trim_mean(array: np.ndarray, proportiontocut: float) -> np.ndarray:
     """Compute trimmed mean along axis=0.
 
     It is based on the scipy implementation.
@@ -274,7 +270,7 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
 
     slice_list = [slice(None)] * atmp.ndim
     slice_list[axis] = slice(lowercut, uppercut)
-    result: NDArray = np.mean(atmp[tuple(slice_list)], axis=axis)
+    result: np.ndarray = np.mean(atmp[tuple(slice_list)], axis=axis)
     return result
 
 
@@ -358,7 +354,7 @@ def _aggregate_n_closest_weights(
          reference weights
     """
     list_of_weights = [weights for weights, num_examples in results]
-    aggregated_weights = []
+    aggregated_weights: NDArrays = []
 
     for layer_id, layer_weights in enumerate(reference_weights):
         other_weights_layer_list = []
