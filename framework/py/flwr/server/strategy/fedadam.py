@@ -151,7 +151,7 @@ class FedAdam(FedOpt):
 
         # Adam
         delta_t: NDArrays = [
-            x - y for x, y in zip(fedavg_weights_aggregate, self.current_weights)
+            np.subtract(x, y) for x, y in zip(fedavg_weights_aggregate, self.current_weights)
         ]
 
         # m_t

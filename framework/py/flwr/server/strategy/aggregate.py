@@ -235,7 +235,7 @@ def aggregate_qffl(
         for j in range(1, len(deltas)):
             tmp += scaled_deltas[j][i]
         updates.append(tmp)
-    new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]
+    new_parameters = [(u - v) * 1.0 for u, v in zip(parameters, updates)]  # type: ignore[operator]
     return new_parameters
 
 
@@ -249,9 +249,9 @@ def _compute_distances(weights: list[NDArrays]) -> NDArray:
     distance_matrix = np.zeros((len(weights), len(weights)))
     for i, flat_w_i in enumerate(flat_w):
         for j, flat_w_j in enumerate(flat_w):
-            delta = flat_w_i - flat_w_j
+            delta = flat_w_i - flat_w_j  # type: ignore[operator]
             norm = np.linalg.norm(delta)
-            distance_matrix[i, j] = norm**2
+            distance_matrix[i, j] = norm**2  # type: ignore[operator]
     return distance_matrix
 
 
@@ -264,7 +264,7 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
     scipy.stats.trim_mean.html.
     """
     axis = 0
-    nobs = array.shape[axis]
+    nobs = array.shape[axis]  # type: ignore[attr-defined]
     lowercut = int(proportiontocut * nobs)
     uppercut = nobs - lowercut
     if lowercut > uppercut:
@@ -272,9 +272,9 @@ def _trim_mean(array: NDArray, proportiontocut: float) -> NDArray:
 
     atmp = np.partition(array, (lowercut, uppercut - 1), axis)
 
-    slice_list = [slice(None)] * atmp.ndim
+    slice_list = [slice(None)] * atmp.ndim  # type: ignore[attr-defined]
     slice_list[axis] = slice(lowercut, uppercut)
-    result: NDArray = np.mean(atmp[tuple(slice_list)], axis=axis)
+    result: NDArray = np.mean(atmp[tuple(slice_list)], axis=axis)  # type: ignore[operator]
     return result
 
 
@@ -286,7 +286,7 @@ def aggregate_trimmed_avg(
     weights = [weights for weights, _ in results]
 
     trimmed_w: NDArrays = [
-        _trim_mean(np.asarray(layer), proportiontocut=proportiontocut)
+        _trim_mean(np.asarray(layer), proportiontocut=proportiontocut)  # type: ignore[operator]
         for layer in zip(*weights)
     ]
 
@@ -298,7 +298,7 @@ def _check_weights_equality(weights1: NDArrays, weights2: NDArrays) -> bool:
     if len(weights1) != len(weights2):
         return False
     return all(
-        np.array_equal(layer_weights1, layer_weights2)
+        np.array_equal(layer_weights1, layer_weights2)  # type: ignore[operator]
         for layer_weights1, layer_weights2 in zip(weights1, weights2)
     )
 
@@ -366,7 +366,7 @@ def _aggregate_n_closest_weights(
             other_weights_layer = other_w[layer_id]
             other_weights_layer_list.append(other_weights_layer)
         other_weights_layer_np = np.array(other_weights_layer_list)
-        diff_np = np.abs(layer_weights - other_weights_layer_np)
+        diff_np = np.abs(layer_weights - other_weights_layer_np)  # type: ignore[operator]
         # Create indices of the smallest differences
         # We do not need the exact order but just the beta closest weights
         # therefore np.argpartition is used instead of np.argsort
@@ -375,6 +375,6 @@ def _aggregate_n_closest_weights(
         # closest distances
         beta_closest_weights = np.take_along_axis(
             other_weights_layer_np, indices=indices, axis=0
-        )[:beta_closest]
+        )[:beta_closest]  # type: ignore[operator]
         aggregated_weights.append(np.mean(beta_closest_weights, axis=0))
     return aggregated_weights

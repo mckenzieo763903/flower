@@ -159,7 +159,7 @@ class FedAvgM(FedAvg):
 
             # remember that updates are the opposite of gradients
             pseudo_gradient: NDArrays = [
-                x - y
+                np.subtract(x, y)
                 for x, y in zip(
                     parameters_to_ndarrays(self.initial_parameters), fedavg_result
                 )
@@ -181,7 +181,7 @@ class FedAvgM(FedAvg):
 
             # SGD
             fedavg_result = [
-                x - self.server_learning_rate * y
+                np.subtract(x, self.server_learning_rate * y)
                 for x, y in zip(initial_weights, pseudo_gradient)
             ]
             # Update current weights
