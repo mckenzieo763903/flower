@@ -70,7 +70,7 @@ def test_ndarray_to_array() -> None:
 
     array = ndarray_to_array(arr)
 
-    arr_ = np.frombuffer(buffer=array.data, dtype=array.dtype).reshape(array.shape)
+    arr_ = np.frombuffer(buffer=array.data, dtype=array.dtype).reshape(array.shape)  # type: ignore[attr-defined]
 
     assert np.array_equal(arr, arr_)
 
@@ -198,7 +198,7 @@ def test_set_metrics_to_metricrecord_with_correct_types(
     arrays = get_ndarrays()
 
     my_metrics = OrderedDict(
-        {key_type(label): value_fn(arr) for label, arr in zip(labels, arrays)}
+        {key_type(label): value_fn(arr) for label, arr in zip(labels, arrays)}  # type: ignore[attr-defined]
     )
 
     # Add metric
@@ -274,7 +274,7 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
     arrays = get_ndarrays()
     my_metrics = cast(
         dict[str, MetricRecordValues],
-        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},
+        {str(label): arr.flatten().tolist() for label, arr in zip(labels, arrays)},  # type: ignore[attr-defined]
     )
     my_metrics_copy = my_metrics.copy()
 
@@ -293,16 +293,16 @@ def test_set_metrics_to_metricrecord_with_and_without_keeping_input(
 @pytest.mark.parametrize(
     "key_type, value_fn",
     [
-        (str, lambda x: str(x.flatten()[0])),  # str: str
-        (str, lambda x: int(x.flatten()[0])),  # str: int
-        (str, lambda x: float(x.flatten()[0])),  # str: float
-        (str, lambda x: bool(x.flatten()[0])),  # str: bool
-        (str, lambda x: x.flatten().tobytes()),  # str: bytes
-        (str, lambda x: x.flatten().astype("str").tolist()),  # str: List[str]
-        (str, lambda x: x.flatten().astype("int").tolist()),  # str: List[int]
-        (str, lambda x: x.flatten().astype("float").tolist()),  # str: List[float]
-        (str, lambda x: x.flatten().astype("bool").tolist()),  # str: List[bool]
-        (str, lambda x: [x.flatten().tobytes()]),  # str: List[bytes]
+        (str, lambda x: str(x.flatten()[0])),  # type: ignore[attr-defined]
+        (str, lambda x: int(x.flatten()[0])),  # type: ignore[attr-defined]
+        (str, lambda x: float(x.flatten()[0])),  # type: ignore[attr-defined]
+        (str, lambda x: bool(x.flatten()[0])),  # type: ignore[attr-defined]
+        (str, lambda x: x.flatten().tobytes()),  # type: ignore[attr-defined]
+        (str, lambda x: x.flatten().astype("str").tolist()),  # type: ignore[attr-defined]
+        (str, lambda x: x.flatten().astype("int").tolist()),  # type: ignore[attr-defined]
+        (str, lambda x: x.flatten().astype("float").tolist()),  # type: ignore[attr-defined]
+        (str, lambda x: x.flatten().astype("bool").tolist()),  # type: ignore[attr-defined]
+        (str, lambda x: [x.flatten().tobytes()]),  # type: ignore[attr-defined]
         (str, lambda x: []),  # str: emptyt list
     ],
 )
@@ -330,11 +330,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         (str, lambda x: x),  # str: NDArray (supported: unsupported)
         (
             str,
-            lambda x: {str(v): v for v in x.flatten()},
+            lambda x: {str(v): v for v in x.flatten()},  # type: ignore[attr-defined]
         ),  # str: dict[str: float] (supported: unsupported)
         (
             str,
-            lambda x: [{str(v): v for v in x.flatten()}],
+            lambda x: [{str(v): v for v in x.flatten()}],  # type: ignore[attr-defined]
         ),  # str: List[dict[str: float]] (supported: unsupported)
         (
             str,
@@ -342,11 +342,11 @@ def test_set_configs_to_configrecord_with_correct_types(
         ),  # str: List[mixing valid types] (supported: unsupported)
         (
             int,
-            lambda x: x.flatten().tolist(),
+            lambda x: x.flatten().tolist(),  # type: ignore[attr-defined]
         ),  # int: List[str] (unsupported: supported)
         (
             float,
-            lambda x: x.flatten().tolist(),
+            lambda x: x.flatten().tolist(),  # type: ignore[attr-defined]
         ),  # float: List[int] (unsupported: supported)
     ],
 )

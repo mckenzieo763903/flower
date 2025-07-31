@@ -152,17 +152,19 @@ class FedAdagrad(FedOpt):
         if not self.m_t:
             self.m_t = [np.zeros_like(x) for x in delta_t]
         self.m_t = [
-            np.multiply(self.beta_1, x) + (1 - self.beta_1) * y
+            np.add(np.multiply(self.beta_1, x), np.multiply(1 - self.beta_1, y))
             for x, y in zip(self.m_t, delta_t)
         ]
 
         # v_t
         if not self.v_t:
             self.v_t = [np.zeros_like(x) for x in delta_t]
-        self.v_t = [x + np.multiply(y, y) for x, y in zip(self.v_t, delta_t)]
+        self.v_t = [
+            np.add(x, np.multiply(y, y)) for x, y in zip(self.v_t, delta_t)
+        ]
 
         new_weights = [
-            x + self.eta * y / (np.sqrt(z) + self.tau)
+            np.add(x, np.divide(np.multiply(self.eta, y), np.add(np.sqrt(z), self.tau)))
             for x, y, z in zip(self.current_weights, self.m_t, self.v_t)
         ]
 
